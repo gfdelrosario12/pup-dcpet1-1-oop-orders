@@ -11,8 +11,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +33,7 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
     /**
      * Creates new form ORDER_DATA_FORM
      */
-    public ORDER_DATA_FORM() throws ClassNotFoundException, SQLException {
+    public ORDER_DATA_FORM() {
         initComponents();
         showOrderNumbersOnComboBox('c');
         showOrdersOnTable();
@@ -65,7 +67,7 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
         tblRecords = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         txtOrNo = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
+        btnSearch = new javax.swing.JButton();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -175,8 +177,13 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
 
         getContentPane().add(txtOrNo, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 290, -1));
 
-        jButton1.setText("Search");
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 60, 110, -1));
+        btnSearch.setText("Search");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 60, 110, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -189,149 +196,192 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtItemsActionPerformed
 
-    public void showOrdersOnTable() throws SQLException, ClassNotFoundException {
+    public void refresh() {
+        DefaultTableModel dt = (DefaultTableModel) tblRecords.getModel();
+        dt.setRowCount(0);
+        showOrdersOnTable();
+    }
+
+    public void showOrdersOnTable() {
         ArrayList<OrdersModel> ordersList = new ArrayList<>();
         String query = "select * from orderTable";
-        conn = ConnectionPool.getConnection();
-        ps = conn.prepareStatement(query);
-        rs = ps.executeQuery();
-        while (rs.next()) {
-            OrdersModel orders = new OrdersModel();
-            orders.setOrNo(rs.getInt("orNo"));
-            orders.setItems(rs.getString("items"));
-            orders.setPrice(rs.getDouble("price"));
-            orders.setNoOrder(rs.getInt("noOrder"));
-            String dataToBeFormatted = rs.getString("date");
-            LocalDate date = LocalDate.parse(dataToBeFormatted);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
-            String formattedDate = date.format(formatter);
-            orders.setDate(formattedDate);
-            ordersList.add(orders);
-        }
-        conn.close();
+        try {
+            conn = ConnectionPool.getConnection();
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                OrdersModel orders = new OrdersModel();
+                orders.setOrNo(rs.getInt("orNo"));
+                orders.setItems(rs.getString("items"));
+                orders.setPrice(rs.getDouble("price"));
+                orders.setNoOrder(rs.getInt("noOrder"));
+                String dataToBeFormatted = rs.getString("date");
+                LocalDate date = LocalDate.parse(dataToBeFormatted);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+                String formattedDate = date.format(formatter);
+                orders.setDate(formattedDate);
+                ordersList.add(orders);
+            }
+            DefaultTableModel dt = (DefaultTableModel) tblRecords.getModel();
 
-        DefaultTableModel dt = (DefaultTableModel) tblRecords.getModel();
+            for (OrdersModel orders : ordersList) {
+                Object[] row = {
+                    orders.getOrNo(),
+                    orders.getItems(),
+                    orders.getPrice(),
+                    orders.getNoOrder(),
+                    orders.getDate()
+                };
+                dt.addRow(row);
+            }
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("getUsersList Error: " + e);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    //ignore
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    //ignore
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //ignore
+                }
+            }
 
-        for (OrdersModel orders : ordersList) {
-            Object[] row = {
-                orders.getOrNo(),
-                orders.getItems(),
-                orders.getPrice(),
-                orders.getNoOrder(),
-                orders.getDate()
-            };
-            dt.addRow(row);
         }
     }
 
-    public void showOrderNumbersOnComboBox(char action) throws ClassNotFoundException {
+    public void showOrderNumbersOnComboBox(char action) {
         switch (action) {
             case 'c':
                 query = "SELECT orNo FROM orderTable";
-                try {
-                    conn = ConnectionPool.getConnection();
-                    ps = conn.prepareStatement(query);
-                    rs = ps.executeQuery();
-                    while (rs.next()) {
-                        int orNo = rs.getInt("orNo");
-                        txtOrNo.addItem(orNo);
+                 {
+                    try {
+                        conn = ConnectionPool.getConnection();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } catch (SQLException e) {
-                    System.out.println("Order Number Error: " + e);
-                } finally {
-                    if (conn != null) {
-                        try {
-                            conn.close();
-                        } catch (SQLException e) {
-                            //ignore
+                }
+                 {
+                    try {
+                        ps = conn.prepareStatement(query);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                 {
+                    try {
+                        rs = ps.executeQuery();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                 {
+                    try {
+                        while (rs.next()) {
+                            int orNo = rs.getInt("orNo");
+                            txtOrNo.addItem(orNo);
                         }
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        } catch (SQLException e) {
-                            //ignore
-                        }
+                }
+                 {
+                    try {
+                        conn.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
                 }
                 break;
+
             case 'a':
                 query = "SELECT orNo FROM orderTable ORDER BY orNo DESC LIMIT 1;";
-                try {
-                    conn = ConnectionPool.getConnection();
-                    ps = conn.prepareStatement(query);
-                    rs = ps.executeQuery();
-                    while (rs.next()) {
-                        int orNo = rs.getInt("orNo");
-                        txtOrNo.addItem(orNo);
+                 {
+                    try {
+                        conn = ConnectionPool.getConnection();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } catch (SQLException e) {
-                    System.out.println("Order Number Error: " + e);
-                } finally {
-                    if (conn != null) {
-                        try {
-                            conn.close();
-                        } catch (SQLException e) {
-                            //ignore
+                }
+                 {
+                    try {
+                        ps = conn.prepareStatement(query);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                 {
+                    try {
+                        rs = ps.executeQuery();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                 {
+                    try {
+                        while (rs.next()) {
+                            int orNo = rs.getInt("orNo");
+                            txtOrNo.addItem(orNo);
                         }
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        } catch (SQLException e) {
-                            //ignore
-                        }
+                }
+                 {
+                    try {
+                        conn.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
                 }
                 break;
+
         }
 
     }
 
-    private void btnAddNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddNewActionPerformed
-
-        String items = txtItems.getText();
-        double price = Double.parseDouble(txtPrice.getText());
-        int noOrder = Integer.parseInt(txtNoOrder.getText());
-        String date = txtDate.getText();
-
-        OrdersModel ordersModel = new OrdersModel(items, price, noOrder, date);
-
+    public int getLastOrNo() {
+        int orNo = 0;
         try {
-            addNewOrders(ordersModel);
-            showOrderNumbersOnComboBox('a');
-            showOrderOnTable(ordersModel);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+            query = "SELECT orNo FROM orderTable ORDER BY orNo DESC LIMIT 1;";
+            conn = ConnectionPool.getConnection();
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                orNo = rs.getInt("orNo");
+            }
+            conn.close();
+
         } catch (SQLException ex) {
             Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        txtItems.setText("");
-        txtPrice.setText("");
-        txtNoOrder.setText("");
-        txtDate.setText("");
-
-        JOptionPane.showMessageDialog(null, "1 Record Added");
-
-    }//GEN-LAST:event_btnAddNewActionPerformed
-
-    public int getLastOrNo() throws SQLException, ClassNotFoundException {
-        int orNo = 0;
-        query = "SELECT orNo FROM orderTable ORDER BY orNo DESC LIMIT 1;";
-        conn = ConnectionPool.getConnection();
-        ps = conn.prepareStatement(query);
-        rs = ps.executeQuery();
-        while (rs.next()) {
-            orNo = rs.getInt("orNo");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
         }
         return orNo;
     }
 
-    public void showOrderOnTable(OrdersModel order) throws SQLException, ClassNotFoundException {
+    public void showOrderOnTable(OrdersModel order) {
         DefaultTableModel dt = (DefaultTableModel) tblRecords.getModel();
-order.setOrNo(getLastOrNo());
+        order.setOrNo(getLastOrNo());
         Object[] row = {
             order.getOrNo(),
             order.getItems(),
@@ -342,27 +392,24 @@ order.setOrNo(getLastOrNo());
         dt.addRow(row);
     }
 
-    public void addNewOrders(OrdersModel orders) throws ClassNotFoundException, SQLException {
-        query = "insert into ordertable ("
-                + "items,"
-                + "price, "
-                + "noOrder, "
-                + "date) "
-                + "values (?,?,?,STR_TO_DATE(?, '%m-%d-%Y'))";
+    public void addNewOrders(OrdersModel orders) {
+        query = "insert into ordertable (items, price, noOrder, date) values (?, ?, ?, ?)";
         try {
             conn = ConnectionPool.getConnection();
             ps = conn.prepareStatement(query);
-            System.out.println(orders.getItems());
-            System.out.println(Double.toString(orders.getPrice()));
-            System.out.println(orders.getNoOrder());
-            System.out.println(orders.getDate());
             ps.setString(1, orders.getItems());
             ps.setDouble(2, orders.getPrice());
             ps.setInt(3, orders.getNoOrder());
-            ps.setString(4, orders.getDate());
+
+            LocalDate date = LocalDate.parse(orders.getDate(), DateTimeFormatter.ofPattern("MM-dd-yyyy"));
+            String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            ps.setString(4, formattedDate);
+
             ps.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Orders Error: " + e);
+            System.out.println("addOrders Error: " + e);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (conn != null) {
                 try {
@@ -382,6 +429,102 @@ order.setOrNo(getLastOrNo());
         }
     }
 
+    public void updateFunctionForDatabase(OrdersModel orders) {
+        try {
+            // ... your existing code ...
+
+            // Convert the date format
+            String inputDate = orders.getDate();
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            SimpleDateFormat outputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String formattedDate = outputDateFormat.format(inputDateFormat.parse(inputDate));
+
+            // Create the SQL update statement
+            query = "UPDATE ordertable SET orNo=?, items=?, price=?, noOrder=?, date=? WHERE orNo=?";
+            conn = ConnectionPool.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, orders.getOrNo());
+            ps.setString(2, orders.getItems());
+            ps.setDouble(3, orders.getPrice());
+            ps.setInt(4, orders.getNoOrder());
+            ps.setString(5, formattedDate);
+            ps.setInt(6, orders.getOrNo());
+
+            // Execute the update statement
+            ps.executeUpdate();
+
+            // ... your existing code ...
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public OrdersModel searchFunction(int orNo) {
+        OrdersModel orderDetails = null;
+        try {
+
+            String query = "SELECT orNo, items, price, noOrder, date "
+                    + "FROM orderTable "
+                    + "WHERE orNo = ?";
+            conn = ConnectionPool.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, orNo);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                int retrievedOrNo = rs.getInt("orNo");
+                String items = rs.getString("items");
+                double price = rs.getDouble("price");
+                int noOrder = rs.getInt("noOrder");
+                String date = rs.getString("date");
+                orderDetails = new OrdersModel(retrievedOrNo, items, price, noOrder, date);
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return orderDetails;
+    }
+
+    public void removeToDatabaseFunction(int orNo) {
+        try {
+            String query = "delete from orderTable "
+                    + "where orNo = ?";
+            conn = ConnectionPool.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, orNo);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+
+    private void btnAddNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddNewActionPerformed
+        try {
+            String items = txtItems.getText();
+            double price = Double.parseDouble(txtPrice.getText());
+            int noOrder = Integer.parseInt(txtNoOrder.getText());
+            String date = txtDate.getText();
+            OrdersModel ordersModel = new OrdersModel(items, price, noOrder, date);
+            addNewOrders(ordersModel);
+            showOrderNumbersOnComboBox('a');
+            refresh();
+            txtItems.setText("");
+            txtPrice.setText("");
+            txtNoOrder.setText("");
+            txtDate.setText("");
+            JOptionPane.showMessageDialog(null, "1 Record Added");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid input. Please enter valid numbers for price and no rder.");
+        } catch (DateTimeParseException e) {
+            JOptionPane.showMessageDialog(null, "Invalid date format. Please use the format MM-DD-YYYY.");
+        }
+    }//GEN-LAST:event_btnAddNewActionPerformed
+
     private void tblRecordsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblRecordsMouseClicked
         DefaultTableModel dt = (DefaultTableModel) tblRecords.getModel();
         int index = tblRecords.getSelectedRow();
@@ -394,56 +537,40 @@ order.setOrNo(getLastOrNo());
     }//GEN-LAST:event_tblRecordsMouseClicked
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        int orNo = (int) txtOrNo.getSelectedItem();
-        String items = txtItems.getText();
-        double price = Double.parseDouble(txtPrice.getText());
-        int noOrder = Integer.parseInt(txtNoOrder.getText());
-        String date = txtDate.getText();
-        
-        OrdersModel orders = new OrdersModel(orNo, items, price, noOrder, date);
-        
         try {
-            updateFunctionForDatabase(orders);
-        } catch (SQLException ex) {
-            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
+            int selectedRowIndex = tblRecords.getSelectedRow();
+            System.out.println("Working before condition");
+            if (selectedRowIndex >= 0) {
+                System.out.println("Working inside condition");
+                int orNo = (int) txtOrNo.getSelectedItem();
+                String items = txtItems.getText();
+                double price = Double.parseDouble(txtPrice.getText());
+                int noOrder = Integer.parseInt(txtNoOrder.getText());
+                String date = txtDate.getText();
+
+                OrdersModel orders = new OrdersModel(orNo, items, price, noOrder, date);
+
+                updateFunctionForDatabase(orders);
+                refresh();
+
+                JOptionPane.showMessageDialog(null, "1 Record Updated");
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select an OrNo from the table before updating");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid input. Please enter valid numbers for price and no rder.");
+        } catch (DateTimeParseException e) {
+            JOptionPane.showMessageDialog(null, "Invalid date format. Please use the format MM-DD-YYYY.");
         }
-
-        DefaultTableModel dt = (DefaultTableModel) tblRecords.getModel();
-        int index = tblRecords.getSelectedRow();
-        dt.setValueAt(orNo, index, 0);
-        dt.setValueAt(items, index, 1);
-        dt.setValueAt(price, index, 2);
-        dt.setValueAt(noOrder, index, 3);
-        dt.setValueAt(date, index, 4);
-
-        JOptionPane.showMessageDialog(null, "1 Record Updated");
 
     }//GEN-LAST:event_btnUpdateActionPerformed
 
-    public void updateFunctionForDatabase(OrdersModel orders) throws SQLException, ClassNotFoundException {
-            String query = "update orderTable set "
-                + "items = ?, "
-                + "price = ?, "
-                + "noOrder = ?, "
-                + "date = ? "
-                + "where orNo = ? ";
-        conn = ConnectionPool.getConnection();
-            ps = conn.prepareStatement(query);
-            ps.setInt(5, orders.getOrNo());
-            ps.setString(1, orders.getItems());
-            ps.setDouble(2, orders.getPrice());
-            ps.setInt(3, orders.getNoOrder());
-            ps.setString(4, orders.getDate());
-            ps.executeUpdate();
-    }
-    
+
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveActionPerformed
-        DefaultTableModel dt = (DefaultTableModel) tblRecords.getModel();
-        int index = tblRecords.getSelectedRow();
-        dt.removeRow(index);
-        txtOrNo.setSelectedItem("");
+        int orNo = (int) txtOrNo.getSelectedItem();
+        removeToDatabaseFunction(orNo);
+        refresh();
+        txtOrNo.removeItem(orNo);
         txtItems.setText("");
         txtPrice.setText("");
         txtNoOrder.setText("");
@@ -452,6 +579,23 @@ order.setOrNo(getLastOrNo());
         JOptionPane.showMessageDialog(null, "1 Record Delete");
 
     }//GEN-LAST:event_btnRemoveActionPerformed
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        int orNo = (int) txtOrNo.getSelectedItem();
+        DefaultTableModel dt = (DefaultTableModel) tblRecords.getModel();
+        dt.setRowCount(0);
+        OrdersModel searchedOrder = searchFunction(orNo);
+        Object[] row = {
+            searchedOrder.getOrNo(),
+            searchedOrder.getItems(),
+            searchedOrder.getPrice(),
+            searchedOrder.getNoOrder(),
+            searchedOrder.getDate()
+        };
+        dt.addRow(row);
+
+        JOptionPane.showMessageDialog(null, "Record found at index " + searchedOrder.getOrNo());
+    }//GEN-LAST:event_btnSearchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -483,13 +627,7 @@ order.setOrNo(getLastOrNo());
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    new ORDER_DATA_FORM().setVisible(true);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SQLException ex) {
-                    Logger.getLogger(ORDER_DATA_FORM.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                new ORDER_DATA_FORM().setVisible(true);
             }
         });
     }
@@ -497,8 +635,8 @@ order.setOrNo(getLastOrNo());
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddNew;
     private javax.swing.JButton btnRemove;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdate;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

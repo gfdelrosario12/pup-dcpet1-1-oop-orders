@@ -50,7 +50,6 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -66,8 +65,10 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblRecords = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         txtOrNo = new javax.swing.JComboBox<>();
         btnSearch = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -85,39 +86,47 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setText("Order-Data");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 20, -1, -1));
-
+        jLabel2.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel2.setText("Price:");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 150, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 220, -1, -1));
 
+        jLabel3.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel3.setText("No Order:");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 190, -1, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 260, -1, -1));
 
+        jLabel4.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel4.setText("Items:");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 110, -1, -1));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 180, -1, -1));
 
+        jLabel5.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel5.setText("Date:");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 230, -1, -1));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 300, -1, -1));
 
+        jLabel6.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel6.setText("OR No:");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, -1, -1));
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 140, -1, -1));
 
+        txtItems.setBackground(new java.awt.Color(203, 184, 184));
         txtItems.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtItemsActionPerformed(evt);
             }
         });
-        getContentPane().add(txtItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 100, 290, -1));
-        getContentPane().add(txtPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 140, 290, -1));
-        getContentPane().add(txtNoOrder, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 180, 290, -1));
+        getContentPane().add(txtItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 170, 290, -1));
 
+        txtPrice.setBackground(new java.awt.Color(203, 184, 184));
+        getContentPane().add(txtPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 210, 290, -1));
+
+        txtNoOrder.setBackground(new java.awt.Color(203, 184, 184));
+        getContentPane().add(txtNoOrder, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 250, 290, -1));
+
+        txtDate.setBackground(new java.awt.Color(203, 184, 184));
         txtDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtDateActionPerformed(evt);
             }
         });
-        getContentPane().add(txtDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 220, 290, -1));
+        getContentPane().add(txtDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 290, 290, -1));
 
         btnUpdate.setText("Update");
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
@@ -125,7 +134,7 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
                 btnUpdateActionPerformed(evt);
             }
         });
-        getContentPane().add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 140, 110, -1));
+        getContentPane().add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 210, 110, -1));
 
         btnAddNew.setText("Add New");
         btnAddNew.addActionListener(new java.awt.event.ActionListener() {
@@ -133,7 +142,7 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
                 btnAddNewActionPerformed(evt);
             }
         });
-        getContentPane().add(btnAddNew, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 100, 110, -1));
+        getContentPane().add(btnAddNew, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 170, 110, -1));
 
         btnRemove.setText("Remove");
         btnRemove.addActionListener(new java.awt.event.ActionListener() {
@@ -141,8 +150,10 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
                 btnRemoveActionPerformed(evt);
             }
         });
-        getContentPane().add(btnRemove, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 180, 110, -1));
+        getContentPane().add(btnRemove, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 250, 110, -1));
 
+        tblRecords.setBackground(new java.awt.Color(203, 184, 184));
+        tblRecords.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 15), new java.awt.Color(203, 184, 184))); // NOI18N
         tblRecords.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -158,24 +169,34 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(tblRecords);
 
-        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 280, 490, 180));
+        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 540, 270));
 
         jPanel1.setForeground(new java.awt.Color(255, 51, 255));
+
+        jLabel1.setFont(new java.awt.Font("DialogInput", 1, 36)); // NOI18N
+        jLabel1.setText("Order-Data");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 610, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(144, 144, 144)
+                .addComponent(jLabel1)
+                .addContainerGap(106, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 60, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 60));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 470, 60));
 
-        getContentPane().add(txtOrNo, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 290, -1));
+        txtOrNo.setBackground(new java.awt.Color(203, 184, 184));
+        getContentPane().add(txtOrNo, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 130, 290, -1));
 
         btnSearch.setText("Search");
         btnSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -183,7 +204,10 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
                 btnSearchActionPerformed(evt);
             }
         });
-        getContentPane().add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 60, 110, -1));
+        getContentPane().add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 130, 110, -1));
+
+        jLabel7.setIcon(new javax.swing.ImageIcon("D:\\GLADWIN PROJECTS\\DIPLOMA IN COMPUTER ENGINEERING TECHNOLOGY\\FIRST YEAR\\SECOND SEMESTER\\OBJECT ORIENTED PROGRAMMING\\FINALS\\SECOND VERSION\\ORDER_DATA2\\bg.jpg")); // NOI18N
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 570, 630));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -643,6 +667,7 @@ public class ORDER_DATA_FORM extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
